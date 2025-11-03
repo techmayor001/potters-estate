@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartGate - Authentication</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .auth-container {
+            max-width: 1200px;
+            width: 100%;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .auth-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .auth-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .auth-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .role-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 30px;
+            background: rgba(102, 126, 234, 0.05);
+            flex-wrap: wrap;
+        }
+
+        .role-card {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .role-card:hover::before {
+            left: 100%;
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .role-card.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .role-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s ease infinite;
+        }
+
+        .role-card h4 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .role-card p {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .auth-form {
+            padding: 40px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form-section {
+            display: none;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-label i {
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #b3b3b3 0%, #808080 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(128, 128, 128, 0.4);
+        }
+
+        .alert {
+            border-radius: 15px;
+            border: none;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #155724;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: #721c24;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #0c5460;
+        }
+
+        .access-pass {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            border: 3px dashed #667eea;
+        }
+
+        .access-pass-id {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #667eea;
+            margin: 20px 0;
+            letter-spacing: 2px;
+        }
+
+        .credentials-display {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .credentials-display h5 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .credential-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .credential-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .dashboard-link {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .dashboard-link a {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .auth-header h1 {
+                font-size: 2rem;
+            }
+
+            .auth-header p {
+                font-size: 1rem;
+            }
+
+            .role-card {
+                min-width: 100%;
+            }
+
+            .auth-form {
+                padding: 30px 20px;
+            }
+
+            .role-icon {
+                font-size: 2.5rem;
+            }
+
+            .btn-primary, .btn-secondary {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-link a:hover {
+            transform: translateX(-5px);
+            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1><i class="fas fa-shield-alt"></i> POTTERS ESTATE GATE</h1>
+                <p>Secure Access Management System</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="role-selector" id="roleSelector">
+                <div class="role-card" onclick="selectRole('chief')">
+                    <div class="role-icon"><i class="fas fa-user-shield"></i></div>
+                    <h4>Chief Security</h4>
+                    <p>Manage security personnel and system access</p>
+                </div>
+                <div class="role-card" onclick="selectRole('security')">
+                    <div class="role-icon"><i class="fas fa-user-lock"></i></div>
+                    <h4>Security Officer</h4>
+                    <p>Register residents and verify visitors</p>
+                </div>
+                <div class="role-card" onclick="selectRole('resident')">
+                    <div class="role-icon"><i class="fas fa-user"></i></div>
+                    <h4>Resident</h4>
+                    <p>Register and manage your visitors</p>
+                </div>
+            </div>
+
+            <!-- Chief Security Login/Register -->
+            <div class="auth-form" id="chiefForm" style="display: none;">
+                <h3 class="text-center mb-4"><i class="fas fa-user-shield"></i> Chief Security Portal</h3>
+                
+                <div id="chiefAlert"></div>
+
+                <div class="form-section active" id="chiefLoginSection">
+                    <form id="chiefLoginForm">
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-id-badge"></i> Chief ID</label>
+                            <input type="text" class="form-control" id="chiefLoginId" placeholder="CHIEF001" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" class="form-control" id="chiefLoginPassword" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="showChiefRegister()">
+                            <i class="fas fa-user-plus"></i> First Time Setup
+                        </button>
+                    </form>
+                </div>
+
+                <div class="form-section" id="chiefRegisterSection">
+                    <form id="chiefRegisterForm">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-user"></i> Full Name</label>
+                            <input type="text" class="form-control" id="chiefName" placeholder="John Doe" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" class="form-control" id="chiefEmail" placeholder="chief@estate.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" class="form-control" id="chiefPhone" placeholder="+234 800 000 0000" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-lock"></i> Create Password</label>
+                            <input type="password" class="form-control" id="chiefPassword" placeholder="Minimum 8 characters" required minlength="8">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Create Chief Account
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="showChiefLogin()">
+                            <i class="fas fa-arrow-left"></i> Back to Login
+                        </button>
+                    </form>
+                </div>
+
+                <button class="btn btn-secondary mt-3" onclick="resetSelection()">
+                    <i class="fas fa-arrow-left"></i> Change Role
+                </button>
+            </div>
+
+            <!-- Security Officer Login/Register -->
+            <div class="auth-form" id="securityForm" style="display: none;">
+                <h3 class="text-center mb-4"><i class="fas fa-user-lock"></i> Security Officer Portal</h3>
+                
+                <div id="securityAlert"></div>
+
+                <div class="form-section active" id="securityLoginSection">
+                    <form id="securityLoginForm">
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-id-badge"></i> Security ID</label>
+                            <input type="text" class="form-control" id="securityLoginId" placeholder="SEC001" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" class="form-control" id="securityLoginPassword" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                        <p class="text-center mt-3 text-muted">
+                            <small>Don't have an ID? Contact Chief Security for registration</small>
+                        </p>
+                    </form>
+                </div>
+
+                <button class="btn btn-secondary mt-3" onclick="resetSelection()">
+                    <i class="fas fa-arrow-left"></i> Change Role
+                </button>
+            </div>
+
+            <!-- Resident Login/Request Access -->
+            <div class="auth-form" id="residentForm" style="display: none;">
+                <h3 class="text-center mb-4"><i class="fas fa-user"></i> Resident Portal</h3>
+                
+                <div id="residentAlert"></div>
+
+                <div class="form-section active" id="residentLoginSection">
+                    <form id="residentLoginForm">
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-id-card"></i> Access Pass ID</label>
+                            <input type="text" class="form-control" id="residentAccessPass" placeholder="RES123456" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" class="form-control" id="residentPassword" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                        <p class="text-center mt-3 text-muted">
+                            <small>Don't have an access pass? Visit security office for registration</small>
+                        </p>
+                    </form>
+                </div>
+
+                <button class="btn btn-secondary mt-3" onclick="resetSelection()">
+                    <i class="fas fa-arrow-left"></i> Change Role
+                </button>
+            </div>
+
+            <!-- Chief Security Dashboard (After Login) -->
+            <div class="auth-form" id="chiefDashboard" style="display: none;">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-user-shield"></i> Chief Security Dashboard
+                </h3>
+                
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> Welcome, <strong id="chiefNameDisplay"></strong>!
+                </div>
+
+                <div class="credentials-display">
+                    <h5><i class="fas fa-id-badge"></i> Your Credentials</h5>
+                    <div class="credential-item">
+                        <div>
+                            <strong>Chief ID:</strong>
+                            <div class="access-pass-id" id="chiefIdDisplay"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h5 class="mb-3"><i class="fas fa-users-cog"></i> Register Security Officer</h5>
+                    <form id="registerSecurityForm">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-user"></i> Officer Name</label>
+                            <input type="text" class="form-control" id="securityOfficerName" placeholder="Jane Smith" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" class="form-control" id="securityOfficerPhone" placeholder="+234 800 000 0000" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" class="form-control" id="securityOfficerEmail" placeholder="officer@estate.com" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Register Security Officer
+                        </button>
+                    </form>
+                </div>
+
+                <div class="dashboard-link">
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Security Officer Dashboard (After Registration by Chief) -->
+            <div class="auth-form" id="securityDashboard" style="display: none;">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-user-lock"></i> Security Officer Dashboard
+                </h3>
+                
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> Welcome, <strong id="securityNameDisplay"></strong>!
+                </div>
+
+                <div class="credentials-display">
+                    <h5><i class="fas fa-id-badge"></i> Your Credentials</h5>
+                    <div class="credential-item">
+                        <div>
+                            <strong>Security ID:</strong>
+                            <div class="access-pass-id" id="securityIdDisplay"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h5 class="mb-3"><i class="fas fa-home"></i> Register Resident</h5>
+                    <form id="registerResidentForm">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-user"></i> Resident Name</label>
+                            <input type="text" class="form-control" id="residentName" placeholder="Michael Johnson" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-door-closed"></i> Unit Number</label>
+                            <input type="text" class="form-control" id="residentUnit" placeholder="A-101" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" class="form-control" id="residentPhoneReg" placeholder="+234 800 000 0000" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" class="form-control" id="residentEmailReg" placeholder="resident@email.com" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Register Resident & Generate Pass
+                        </button>
+                    </form>
+                </div>
+
+                <div class="dashboard-link">
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resident Dashboard (After Login) -->
+            <div class="auth-form" id="residentDashboard" style="display: none;">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-user"></i> Resident Portal
+                </h3>
+                
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> Access Verified! Welcome, <strong id="residentNameDisplay"></strong>
+                </div>
+
+                <div class="credentials-display">
+                    <h5><i class="fas fa-id-card"></i> Your Access Pass</h5>
+                    <div class="credential-item">
+                        <div>
+                            <strong>Access Pass ID:</strong>
+                            <div class="access-pass-id" id="residentPassDisplay"></div>
+                        </div>
+                    </div>
+                    <div class="credential-item">
+                        <div><strong>Unit:</strong> <span id="residentUnitDisplay"></span></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-link">
+                    <a href="visitor-management.html">
+                        <i class="fas fa-arrow-right"></i> Go to Visitor Management
+                    </a>
+                </div>
+
+                <div class="dashboard-link">
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="#" onclick="window.history.back(); return false;">
+                <i class="fas fa-arrow-left"></i> Back to Main Site
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // In-memory storage for demo
+        let chiefs = [];
+        let securityOfficers = [];
+        let residents = [];
+        let currentUser = null;
+
+        // Role Selection
+        function selectRole(role) {
+            document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            document.getElementById('roleSelector').style.display = 'none';
+            
+            if (role === 'chief') {
+                document.getElementById('chiefForm').style.display = 'block';
+            } else if (role === 'security') {
+                document.getElementById('securityForm').style.display = 'block';
+            } else if (role === 'resident') {
+                document.getElementById('residentForm').style.display = 'block';
+            }
+        }
+
+        function resetSelection() {
+            document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+            document.getElementById('roleSelector').style.display = 'flex';
+            document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
+            clearAlerts();
+        }
+
+        // Chief Security Functions
+        function showChiefRegister() {
+            document.getElementById('chiefLoginSection').classList.remove('active');
+            document.getElementById('chiefRegisterSection').classList.add('active');
+        }
+
+        function showChiefLogin() {
+            document.getElementById('chiefRegisterSection').classList.remove('active');
+            document.getElementById('chiefLoginSection').classList.add('active');
+        }
+
+        document.getElementById('chiefRegisterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const chief = {
+                id: 'CHIEF' + String(chiefs.length + 1).padStart(3, '0'),
+                name: document.getElementById('chiefName').value,
+                email: document.getElementById('chiefEmail').value,
+                phone: document.getElementById('chiefPhone').value,
+                password: document.getElementById('chiefPassword').value,
+                createdAt: new Date().toISOString()
+            };
+
+            chiefs.push(chief);
+            
+            showAlert('chiefAlert', 'success', `
+                <strong>Account Created Successfully!</strong><br>
+                Your Chief Security ID is: <strong>${chief.id}</strong><br>
+                Please save this ID for future logins.
+            `);
+
+            currentUser = chief;
+            
+            setTimeout(() => {
+                document.getElementById('chiefForm').style.display = 'none';
+                document.getElementById('chiefDashboard').style.display = 'block';
+                document.getElementById('chiefNameDisplay').textContent = chief.name;
+                document.getElementById('chiefIdDisplay').textContent = chief.id;
+            }, 2000);
+        });
+
+        document.getElementById('chiefLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('chiefLoginId').value;
+            const password = document.getElementById('chiefLoginPassword').value;
+            
+            const chief = chiefs.find(c => c.id === id && c.password === password);
+            
+            if (chief) {
+                currentUser = chief;
+                showAlert('chiefAlert', 'success', 'Login successful! Redirecting...');
+                
+                setTimeout(() => {
+                    document.getElementById('chiefForm').style.display = 'none';
+                    document.getElementById('chiefDashboard').style.display = 'block';
+                    document.getElementById('chiefNameDisplay').textContent = chief.name;
+                    document.getElementById('chiefIdDisplay').textContent = chief.id;
+                }, 1500);
+            } else {
+                showAlert('chiefAlert', 'danger', 'Invalid credentials. Please try again.');
+            }
+        });
+
+        // Register Security Officer
+        document.getElementById('registerSecurityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const officer = {
+                id: 'SEC' + String(securityOfficers.length + 1).padStart(3, '0'),
+                name: document.getElementById('securityOfficerName').value,
+                phone: document.getElementById('securityOfficerPhone').value,
+                email: document.getElementById('securityOfficerEmail').value,
+                password: 'Security' + Math.random().toString(36).slice(-8),
+                registeredBy: currentUser.id,
+                createdAt: new Date().toISOString()
+            };
+
+            securityOfficers.push(officer);
+            
+            showAlert('chiefAlert', 'success', `
+                <strong>Security Officer Registered!</strong><br>
+                <strong>ID:</strong> ${officer.id}<br>
+                <strong>Temporary Password:</strong> ${officer.password}<br>
+                <em>Share these credentials with the officer.</em>
+            `);
+
+            this.reset();
+        });
+
+        // Security Officer Login
+        document.getElementById('securityLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('securityLoginId').value;
+            const password = document.getElementById('securityLoginPassword').value;
+            
+            const officer = securityOfficers.find(o => o.id === id && o.password === password);
+            
+            if (officer) {
+                currentUser = officer;
+                showAlert('securityAlert', 'success', 'Login successful! Redirecting...');
+                
+                setTimeout(() => {
+                    document.getElementById('securityForm').style.display = 'none';
+                    document.getElementById('securityDashboard').style.display = 'block';
+                    document.getElementById('securityNameDisplay').textContent = officer.name;
+                    document.getElementById('securityIdDisplay').textContent = officer.id;
+                }, 1500);
+            } else {
+                showAlert('securityAlert', 'danger', 'Invalid credentials. Please contact Chief Security.');
+            }
+        });
+
+        // Register Resident
+        document.getElementById('registerResidentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const resident = {
+                accessPass: 'RES' + Date.now().toString().slice(-6),
+                name: document.getElementById('residentName').value,
+                unit: document.getElementById('residentUnit').value,
+                phone: document.getElementById('residentPhoneReg').value,
+                email: document.getElementById('residentEmailReg').value,
+                password: 'Pass' + Math.random().toString(36).slice(-8),
+                registeredBy: currentUser.id,
+                createdAt: new Date().toISOString()
+            };
+
+            residents.push(resident);
+            
+            showAlert('securityAlert', 'success', `
+                <strong>Resident Registered Successfully!</strong><br>
+                <strong>Access Pass ID:</strong> ${resident.accessPass}<br>
+                <strong>Temporary Password:</strong> ${resident.password}<br>
+                <strong>Unit:</strong> ${resident.unit}<br>
+                <em>Provide these credentials to the resident.</em>
+            `);
+
+            this.reset();
+        });
+
+        // Resident Login
+        document.getElementById('residentLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const accessPass = document.getElementById('residentAccessPass').value;
+            const password = document.getElementById('residentPassword').value;
+            
+            const resident = residents.find(r => r.accessPass === accessPass && r.password === password);
+            
+            if (resident) {
+                currentUser = resident;
+                showAlert('residentAlert', 'success', 'Access granted! Redirecting...');
+                
+                setTimeout(() => {
+                    document.getElementById('residentForm').style.display = 'none';
+                    document.getElementById('residentDashboard').style.display = 'block';
+                    document.getElementById('residentNameDisplay').textContent = resident.name;
+                    document.getElementById('residentPassDisplay').textContent = resident.accessPass;
+                    document.getElementById('residentUnitDisplay').textContent = resident.unit;
+                }, 1500);
+            } else {
+                showAlert('residentAlert', 'danger', 'Invalid access pass or password. Please contact security.');
+            }
+        });
+
+        // Helper Functions
+        function showAlert(containerId, type, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="alert alert-${type}">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+        }
+
+        function clearAlerts() {
+            document.querySelectorAll('[id$="Alert"]').forEach(alert => alert.innerHTML = '');
+        }
+
+        function logout() {
+            currentUser = null;
+            document.querySelectorAll('.auth-form').forEach(form => form.style.display = 'none');
+            document.getElementById('roleSelector').style.display = 'flex';
+            document.querySelectorAll('.role-card').forEach(card => card.classList.remove('active'));
+            clearAlerts();
+            
+            // Reset all forms
+            document.querySelectorAll('form').forEach(form => form.reset());
+        }
+
+        // Demo data for testing
+        function loadDemoData() {
+            // Add a demo chief
+            chiefs.push({
+                id: 'CHIEF001',
+                name: 'Chief Admin',
+                email: 'chief@estate.com',
+                phone: '+234 800 000 0001',
+                password: 'chief123',
+                createdAt: new Date().toISOString()
+            });
+
+            // Add a demo security officer
+            securityOfficers.push({
+                id: 'SEC001',
+                name: 'Officer John',
+                phone: '+234 800 000 0002',
+                email: 'officer@estate.com',
+                password: 'security123',
+                registeredBy: 'CHIEF001',
+                createdAt: new Date().toISOString()
+            });
+
+            // Add a demo resident
+            residents.push({
+                accessPass: 'RES123456',
+                name: 'Michael Johnson',
+                unit: 'A-101',
+                phone: '+234 800 000 0003',
+                email: 'resident@email.com',
+                password: 'resident123',
+                registeredBy: 'SEC001',
+                createdAt: new Date().toISOString()
+            });
+
+            console.log('Demo Data Loaded:');
+            console.log('Chief - ID: CHIEF001, Password: chief123');
+            console.log('Security - ID: SEC001, Password: security123');
+            console.log('Resident - Pass: RES123456, Password: resident123');
+        }
+
+        // Load demo data on page load
+        loadDemoData();
+
+        // Show credentials in console for easy testing
+        console.log('%c🔐 DEMO CREDENTIALS', 'color: #667eea; font-size: 16px; font-weight: bold;');
+        console.log('%cChief Security:', 'color: #667eea; font-weight: bold;');
+        console.log('ID: CHIEF001 | Password: chief123');
+        console.log('%cSecurity Officer:', 'color: #667eea; font-weight: bold;');
+        console.log('ID: SEC001 | Password: security123');
+        console.log('%cResident:', 'color: #667eea; font-weight: bold;');
+        console.log('Access Pass: RES123456 | Password: resident123');
+    </script>
+</body>
+</html>
