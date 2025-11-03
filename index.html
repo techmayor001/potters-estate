@@ -536,6 +536,11 @@
                     <i class="fas fa-chart-line"></i> <span class="d-none d-sm-inline">Dashboard</span>
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="dashboard-tab" data-bs-toggle="pill" data-bs-target="#dashboard" type="button">
+                    <i class="fas fa-sign-out-alt"></i> <span class="d-none d-sm-inline">Checkout</span>
+                </button>
+            </li>
         </ul>
 
         <!-- Tab Content -->
@@ -893,6 +898,7 @@
                     <p class="mb-2"><strong>Visitor:</strong> ${visitor.visitorName}</p>
                     <p class="mb-2"><strong>Exit Time:</strong> ${exitTime.toLocaleTimeString()}</p>
                     <p class="mb-0"><strong>Visit Duration:</strong> ${duration} minutes</p>
+                    <button >checkout</button>
                 </div>
             `;
             resultDiv.style.display = 'block';
